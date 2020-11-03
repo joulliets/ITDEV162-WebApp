@@ -1,3 +1,4 @@
+
 using System;
 using System.Linq;
 using System.Collections.Generic;
@@ -13,7 +14,7 @@ namespace API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    
+
     public class PostsController : ControllerBase
     {
         private readonly IMediator mediator;
@@ -34,7 +35,7 @@ namespace API.Controllers
         /// GET api/posts
         /// </summary>
         /// <returns>A list of posts</returns>
-        
+
         [HttpGet]
         public ActionResult<List<Post>> Get()
         {
@@ -46,7 +47,7 @@ namespace API.Controllers
         /// </summary>
         /// <param name="id">Post id</param>
         /// <returns>A single post</returns>
-        
+
         [HttpGet("{id}")]
         public ActionResult<Post> GetById(Guid id)
         {
@@ -71,14 +72,42 @@ namespace API.Controllers
 
             context.Posts.Add(post);
             var success = context.SaveChanges() > 0;
-           
+
             if (success)
             {
                 return post;
             }
             throw new Exception("Error creating post");
         }
-        
 
+        /// <summary>
+        /// POST api/post
+        /// </summary>
+        ///<param names="request">JSON request containing one or more updated post fields</param>
+        /// <returns>An updated post</returns>
+        [HttpPut]
+        public ActionResult<Post> Update([FromBody] Post request)
+        {
+            var post = context.Posts.Find(request.Id);
+
+            if (post == null)
+            {
+                throw new Exception("Could not find post");
+            }
+
+            post.Title = request.Title != null ? request.Title : post.Title;
+            post.Body = request.Body != null ? request.Body : post.Body;
+            post.Date = request.Date != null ? request.Date : post.Date;
+
+            var success = context.SaveChanges() > 0;
+
+            if (success)
+            {
+                return post;
+            }
+
+            throw new Exception("Error updating post");
+        }
+    
     }
 }
